@@ -3,16 +3,20 @@ import type { GameMode } from './types/game';
 import { useGameState } from './hooks/useGameState';
 import { HomeScreen } from './components/HomeScreen';
 import { BookSelectionScreen } from './components/BookSelectionScreen';
+import { QuestionCountSelection } from './components/QuestionCountSelection';
 import { GameScreen } from './components/GameScreen';
 import { GameResults } from './components/GameResults';
 import { ProgressScreen } from './components/ProgressScreen';
 import { LoadingScreen } from './components/LoadingSpinner';
+import { fetchWordsFromBook } from './data/words';
 
-type AppScreen = 'home' | 'book-selection' | 'game' | 'results' | 'progress';
+type AppScreen = 'home' | 'book-selection' | 'question-count' | 'game' | 'results' | 'progress';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('home');
   const [selectedGameMode, setSelectedGameMode] = useState<GameMode | null>(null);
+  const [selectedBook, setSelectedBook] = useState<'เล่ม 1' | 'เล่ม 2' | null>(null);
+  const [bookWordCount, setBookWordCount] = useState<number>(0);
   const [lastAnswer, setLastAnswer] = useState<{ isCorrect: boolean; selectedAnswer: string } | null>(null);
   
   const {
@@ -31,11 +35,33 @@ function App() {
     setCurrentScreen('book-selection');
   };
 
-  const handleSelectBook = (book: 'เล่ม 1' | 'เล่ม 2') => {
-    if (selectedGameMode) {
-      startGameWithBook(selectedGameMode, book);
+  const handleSelectBook = async (book: 'เล่ม 1' | 'เล่ม 2') => {
+    setSelectedBook(book);
+    
+    // Fetch word count for the selected book
+    try {
+      const bookWords = await fetchWordsFromBook(book);
+      setBookWordCount(bookWords.length);
+      setCurrentScreen('question-count');
+    } catch (error) {
+      console.error('Failed to fetch book words:', error);
+      // Fallback to starting game directly with all words
+      if (selectedGameMode) {
+        startGameWithBook(selectedGameMode, book, 'all');
+        setCurrentScreen('game');
+      }
+    }
+  };
+
+  const handleSelectQuestionCount = (count: number | 'all') => {
+    if (selectedGameMode && selectedBook) {
+      startGameWithBook(selectedGameMode, selectedBook, count);
       setCurrentScreen('game');
     }
+  };
+
+  const handleBackToBookSelection = () => {
+    setCurrentScreen('book-selection');
   };
 
   const handleAnswer = (selectedAnswer: string) => {
@@ -53,8 +79,11 @@ function App() {
   };
 
   const handlePlayAgain = () => {
-    if (currentGame) {
-      // Go back to book selection to choose again
+    if (currentGame && selectedBook) {
+      // Go back to question count selection to choose again
+      setCurrentScreen('question-count');
+    } else {
+      // Go back to book selection if no book is selected
       setCurrentScreen('book-selection');
     }
   };
@@ -62,6 +91,9 @@ function App() {
   const handleBackToHome = () => {
     resetGame();
     setCurrentScreen('home');
+    setSelectedGameMode(null);
+    setSelectedBook(null);
+    setBookWordCount(0);
     setLastAnswer(null);
   };
 
@@ -101,6 +133,20 @@ function App() {
         <BookSelectionScreen
           onSelectBook={handleSelectBook}
           onBack={handleBackToHome}
+        />
+      );
+
+    case 'question-count':
+      if (!selectedBook) {
+        setCurrentScreen('book-selection');
+        return null;
+      }
+      return (
+        <QuestionCountSelection
+          bookName={selectedBook}
+          totalWords={bookWordCount}
+          onSelectCount={handleSelectQuestionCount}
+          onBack={handleBackToBookSelection}
         />
       );
 

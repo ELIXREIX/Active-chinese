@@ -54,11 +54,12 @@ export function useGameState() {
     localStorage.setItem('chineseWordGameStats', JSON.stringify(newStats));
     setStats(newStats);
   };
-
-  const startGame = (mode: GameMode, wordCount: number = 10) => {
+  const startGame = (mode: GameMode, wordCount?: number) => {
     if (words.length === 0) return;
 
-    const gameWords = shuffleArray(words).slice(0, Math.min(wordCount, words.length));
+    // If no wordCount specified, use all available words
+    const maxWords = wordCount || words.length;
+    const gameWords = shuffleArray(words).slice(0, Math.min(maxWords, words.length));
     const game = {
       words: gameWords,
       currentIndex: 0,
@@ -71,8 +72,7 @@ export function useGameState() {
     setCurrentGame(game);
     generateNextQuestion(game);
   };
-
-  const startGameWithBook = async (mode: GameMode, bookName: 'เล่ม 1' | 'เล่ม 2') => {
+  const startGameWithBook = async (mode: GameMode, bookName: 'เล่ม 1' | 'เล่ม 2', questionCount?: number | 'all') => {
     try {
       setIsLoading(true);
       const bookWords = await fetchWordsFromBook(bookName);
@@ -83,8 +83,16 @@ export function useGameState() {
         return;
       }
 
-      // Use all words from the selected book instead of limiting to 10
-      const gameWords = shuffleArray(bookWords);
+      // Determine how many words to use
+      let gameWords: ChineseWord[];
+      if (questionCount === 'all' || !questionCount) {
+        // Use all words from the selected book
+        gameWords = shuffleArray(bookWords);
+      } else {
+        // Use specified number of words
+        gameWords = shuffleArray(bookWords).slice(0, Math.min(questionCount, bookWords.length));
+      }
+
       const game = {
         words: gameWords,
         currentIndex: 0,
