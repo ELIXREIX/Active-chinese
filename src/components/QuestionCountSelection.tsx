@@ -21,6 +21,16 @@ export function QuestionCountSelection({
   onSelectCount, 
   onBack 
 }: QuestionCountSelectionProps) {
+  
+  // Debug logging
+  console.log('QuestionCountSelection Debug:', {
+    bookName,
+    totalWords,
+    environment: import.meta.env.MODE,
+    hasApiKey: !!import.meta.env.VITE_GOOGLE_SHEETS_API_KEY,
+    hasSheetId: !!import.meta.env.VITE_GOOGLE_SHEET_ID
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-2xl mx-auto">
