@@ -85,6 +85,127 @@ export const sampleWords: ChineseWord[] = [
     meaning: 'beautiful',
     level: 'intermediate',
     category: 'adjectives'
+  },
+  // Additional words for testing "All Questions" feature
+  {
+    id: '11',
+    chinese: '吃饭',
+    pinyin: 'chī fàn',
+    meaning: 'to eat',
+    level: 'beginner',
+    category: 'food'
+  },
+  {
+    id: '12',
+    chinese: '喝水',
+    pinyin: 'hē shuǐ',
+    meaning: 'to drink water',
+    level: 'beginner',
+    category: 'food'
+  },
+  {
+    id: '13',
+    chinese: '睡觉',
+    pinyin: 'shuì jiào',
+    meaning: 'to sleep',
+    level: 'beginner',
+    category: 'daily'
+  },
+  {
+    id: '14',
+    chinese: '起床',
+    pinyin: 'qǐ chuáng',
+    meaning: 'to get up',
+    level: 'beginner',
+    category: 'daily'
+  },
+  {
+    id: '15',
+    chinese: '上班',
+    pinyin: 'shàng bān',
+    meaning: 'to go to work',
+    level: 'intermediate',
+    category: 'career'
+  },
+  {
+    id: '16',
+    chinese: '下班',
+    pinyin: 'xià bān',
+    meaning: 'to get off work',
+    level: 'intermediate',
+    category: 'career'
+  },
+  {
+    id: '17',
+    chinese: '买东西',
+    pinyin: 'mǎi dōng xi',
+    meaning: 'to buy things/shopping',
+    level: 'intermediate',
+    category: 'shopping'
+  },
+  {
+    id: '18',
+    chinese: '看书',
+    pinyin: 'kàn shū',
+    meaning: 'to read books',
+    level: 'beginner',
+    category: 'education'
+  },
+  {
+    id: '19',
+    chinese: '听音乐',
+    pinyin: 'tīng yīn yuè',
+    meaning: 'to listen to music',
+    level: 'intermediate',
+    category: 'entertainment'
+  },
+  {
+    id: '20',
+    chinese: '看电影',
+    pinyin: 'kàn diàn yǐng',
+    meaning: 'to watch movies',
+    level: 'intermediate',
+    category: 'entertainment'
+  },
+  {
+    id: '21',
+    chinese: '运动',
+    pinyin: 'yùn dòng',
+    meaning: 'exercise/sports',
+    level: 'intermediate',
+    category: 'health'
+  },
+  {
+    id: '22',
+    chinese: '游泳',
+    pinyin: 'yóu yǒng',
+    meaning: 'to swim',
+    level: 'intermediate',
+    category: 'sports'
+  },
+  {
+    id: '23',
+    chinese: '跑步',
+    pinyin: 'pǎo bù',
+    meaning: 'to run/jogging',
+    level: 'intermediate',
+    category: 'sports'
+  },
+  {
+    id: '24',
+    chinese: '开车',
+    pinyin: 'kāi chē',
+    meaning: 'to drive',
+    level: 'intermediate',
+    category: 'transportation'
+  },
+  {
+    id: '25',
+    chinese: '坐车',
+    pinyin: 'zuò chē',
+    meaning: 'to take a car/bus',
+    level: 'beginner',
+    category: 'transportation'
   }
 ];
 
