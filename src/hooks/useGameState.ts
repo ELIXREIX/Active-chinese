@@ -71,11 +71,13 @@ export function useGameState() {
 
     setCurrentGame(game);
     generateNextQuestion(game);
-  };
-  const startGameWithBook = async (mode: GameMode, bookName: 'เล่ม 1' | 'เล่ม 2', questionCount?: number | 'all') => {
+  };  const startGameWithBook = async (mode: GameMode, bookName: 'เล่ม 1' | 'เล่ม 2', questionCount?: number | 'all') => {
     try {
       setIsLoading(true);
+      console.log('🎮 Starting game with book:', { mode, bookName, questionCount });
+      
       const bookWords = await fetchWordsFromBook(bookName);
+      console.log('📚 Fetched words from book:', { bookName, wordCount: bookWords.length });
       
       if (bookWords.length === 0) {
         console.error('No words loaded from book:', bookName);
@@ -88,9 +90,11 @@ export function useGameState() {
       if (questionCount === 'all' || !questionCount) {
         // Use all words from the selected book
         gameWords = shuffleArray(bookWords);
+        console.log('🎯 Using ALL words:', gameWords.length);
       } else {
         // Use specified number of words
         gameWords = shuffleArray(bookWords).slice(0, Math.min(questionCount, bookWords.length));
+        console.log('🎯 Using limited words:', { requested: questionCount, actual: gameWords.length });
       }
 
       const game = {
@@ -101,6 +105,12 @@ export function useGameState() {
         mode,
         startTime: new Date()
       };
+
+      console.log('🕹️ Game initialized:', { 
+        totalWords: game.words.length, 
+        mode: game.mode,
+        firstWord: game.words[0]?.chinese 
+      });
 
       setCurrentGame(game);
       gameService.setWords(bookWords);
