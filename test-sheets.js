@@ -1,13 +1,14 @@
 // Test Google Sheets API connection
 console.log('Starting Google Sheets API test...');
 
-const API_KEY = 'AIzaSyATDXsSLhZ5u0AaHNaDYpHpk_MoxlSmtZo';
+// Use environment variable for security
+const API_KEY = process.env.VITE_GOOGLE_SHEETS_API_KEY || 'YOUR_API_KEY_HERE';
 const SHEET_ID = '1REVTJHA3opjk-sJol24Q98cRjiB99o3orZK5leb6kdQ';
 
 async function testGoogleSheets() {
   try {
     console.log('Testing Google Sheets API...');
-    console.log('API Key:', API_KEY ? 'Configured' : 'Missing');
+    console.log('API Key:', API_KEY && API_KEY !== 'YOUR_API_KEY_HERE' ? '***HIDDEN***' : 'Missing');
     console.log('Sheet ID:', SHEET_ID ? 'Configured' : 'Missing');
     
     // Test Book 1
