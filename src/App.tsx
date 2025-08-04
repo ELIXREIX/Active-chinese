@@ -17,7 +17,6 @@ function App() {
   const [selectedGameMode, setSelectedGameMode] = useState<GameMode | null>(null);
   const [selectedBook, setSelectedBook] = useState<'เล่ม 1' | 'เล่ม 2' | null>(null);
   const [bookWordCount, setBookWordCount] = useState<number>(0);
-  const [lastAnswer, setLastAnswer] = useState<{ isCorrect: boolean; selectedAnswer: string } | null>(null);
   
   const {
     words,
@@ -67,8 +66,7 @@ function App() {
   const handleAnswer = (selectedAnswer: string) => {
     if (!currentQuestion) return;
     
-    const isCorrect = answerQuestion(selectedAnswer) ?? false;
-    setLastAnswer({ isCorrect, selectedAnswer });
+    answerQuestion(selectedAnswer);
     
     // Check if game is finished
     if (currentGame && currentGame.currentIndex >= currentGame.words.length - 1) {
@@ -94,7 +92,6 @@ function App() {
     setSelectedGameMode(null);
     setSelectedBook(null);
     setBookWordCount(0);
-    setLastAnswer(null);
   };
 
   const handleViewProgress = () => {
@@ -164,8 +161,6 @@ function App() {
           score={currentGame.score}
           onAnswer={handleAnswer}
           onBack={handleBackToHome}
-          showResult={!!lastAnswer}
-          isCorrect={lastAnswer?.isCorrect || false}
         />
       );
 

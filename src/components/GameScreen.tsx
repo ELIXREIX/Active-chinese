@@ -12,7 +12,6 @@ interface GameScreenProps {
   onAnswer: (selectedAnswer: string) => void;
   onBack: () => void;
   showResult?: boolean;
-  isCorrect?: boolean;
 }
 
 export function GameScreen({
@@ -22,22 +21,27 @@ export function GameScreen({
   totalQuestions,
   score,
   onAnswer,
-  onBack,
-  isCorrect = false
+  onBack
 }: GameScreenProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   const [showFeedback, setShowFeedback] = useState(false);
+  const [answerResult, setAnswerResult] = useState<boolean | null>(null);
 
   useEffect(() => {
     setSelectedAnswer('');
     setShowFeedback(false);
+    setAnswerResult(null);
   }, [question]);
 
   const handleAnswerClick = (answer: string) => {
     if (showFeedback) return;
     
+    const correctAnswer = question.answers.find(a => a.isCorrect);
+    const isAnswerCorrect = answer === correctAnswer?.text;
+    
     setSelectedAnswer(answer);
     setShowFeedback(true);
+    setAnswerResult(isAnswerCorrect);
     
     setTimeout(() => {
       onAnswer(answer);
@@ -119,7 +123,6 @@ export function GameScreen({
           </div>
         </div>        {/* Progress Bar */}
         <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
-          {/* eslint-disable-next-line react/forbid-dom-props */}
           <div
             className="bg-blue-500 h-2 rounded-full transition-all duration-300"
             style={{ width: `${(currentQuestionNumber / totalQuestions) * 100}%` }}
@@ -186,9 +189,9 @@ export function GameScreen({
             <div className="text-center">
               <div className={cn(
                 'text-lg font-semibold mb-2',
-                isCorrect ? 'text-green-600' : 'text-red-600'
+                answerResult ? 'text-green-600' : 'text-red-600'
               )}>
-                {isCorrect ? '正确! (Correct!)' : '错误 (Incorrect)'}
+                {answerResult ? '正确! (Correct!)' : '错误 (Incorrect)'}
               </div>
               <div className="text-gray-600">
                 <div className="mb-2">
