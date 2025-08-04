@@ -43,14 +43,77 @@ export function GameScreen({
     setShowFeedback(true);
     setAnswerResult(isAnswerCorrect);
     
+    // Play feedback audio
+    playFeedbackAudio(isAnswerCorrect);
+    
     setTimeout(() => {
       onAnswer(answer);
     }, 1500);
   };
 
   const playAudio = () => {
-    // TODO: Implement text-to-speech for Chinese pronunciation
-    console.log('Playing audio for:', question.word.pinyin);
+    if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      // Create speech utterance
+      const utterance = new SpeechSynthesisUtterance(question.word.chinese);
+      
+      // Configure Chinese voice settings
+      utterance.lang = 'zh-CN'; // Chinese (Simplified)
+      utterance.rate = 0.8; // Slightly slower for learning
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      // Try to find a Chinese voice
+      const voices = window.speechSynthesis.getVoices();
+      const chineseVoice = voices.find(voice => 
+        voice.lang.startsWith('zh') || 
+        voice.name.toLowerCase().includes('chinese') ||
+        voice.name.toLowerCase().includes('mandarin')
+      );
+      
+      if (chineseVoice) {
+        utterance.voice = chineseVoice;
+      }
+      
+      // Speak the Chinese text
+      window.speechSynthesis.speak(utterance);
+      
+      console.log('Playing audio for:', question.word.chinese, '(' + question.word.pinyin + ')');
+    } else {
+      console.warn('Speech Synthesis not supported in this browser');
+      alert('การออกเสียงไม่รองรับในเบราว์เซอร์นี้');
+    }
+  };
+
+  const playFeedbackAudio = (isCorrect: boolean) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      
+      const text = isCorrect ? '很好！' : '再试一次';
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      utterance.lang = 'zh-CN';
+      utterance.rate = 0.9;
+      utterance.pitch = isCorrect ? 1.2 : 0.8;
+      utterance.volume = 0.8;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const chineseVoice = voices.find(voice => 
+        voice.lang.startsWith('zh') || 
+        voice.name.toLowerCase().includes('chinese')
+      );
+      
+      if (chineseVoice) {
+        utterance.voice = chineseVoice;
+      }
+      
+      // Play feedback after a short delay
+      setTimeout(() => {
+        window.speechSynthesis.speak(utterance);
+      }, 500);
+    }
   };
 
   const getQuestionDisplay = () => {
@@ -62,6 +125,13 @@ export function GameScreen({
               {question.word.chinese}
             </div>
             <div className="text-xl text-gray-600 mb-2">{question.word.pinyin}</div>
+            <button
+              onClick={playAudio}
+              className="flex items-center justify-center mx-auto mb-4 p-3 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors"
+              aria-label="Play pronunciation audio"
+            >
+              <Volume2 className="w-6 h-6 text-blue-600" />
+            </button>
           </div>
         );
       case 'meaning-to-chinese':
@@ -70,6 +140,16 @@ export function GameScreen({
             <div className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4">
               "{question.word.meaning}"
             </div>
+            <div className="text-lg text-gray-500 mb-2">
+              听一听正确发音: {question.word.chinese} ({question.word.pinyin})
+            </div>
+            <button
+              onClick={playAudio}
+              className="flex items-center justify-center mx-auto mb-4 p-3 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors"
+              aria-label="Play pronunciation audio"
+            >
+              <Volume2 className="w-6 h-6 text-blue-600" />
+            </button>
           </div>
         );
       case 'pinyin-to-chinese':
@@ -93,6 +173,13 @@ export function GameScreen({
               {question.word.chinese}
             </div>
             <div className="text-xl text-gray-600 mb-2">{question.word.meaning}</div>
+            <button
+              onClick={playAudio}
+              className="flex items-center justify-center mx-auto mb-4 p-3 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors"
+              aria-label="Play pronunciation audio"
+            >
+              <Volume2 className="w-6 h-6 text-blue-600" />
+            </button>
           </div>
         );
       default:
@@ -194,8 +281,16 @@ export function GameScreen({
                 {answerResult ? '正确! (Correct!)' : '错误 (Incorrect)'}
               </div>
               <div className="text-gray-600">
-                <div className="mb-2">
-                  <span className="font-medium">Chinese:</span> {question.word.chinese}
+                <div className="mb-2 flex items-center justify-center gap-2">
+                  <span className="font-medium">Chinese:</span> 
+                  <span className="text-lg">{question.word.chinese}</span>
+                  <button
+                    onClick={playAudio}
+                    className="p-1 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors"
+                    aria-label="Play pronunciation"
+                  >
+                    <Volume2 className="w-4 h-4 text-blue-600" />
+                  </button>
                 </div>
                 <div className="mb-2">
                   <span className="font-medium">Pinyin:</span> {question.word.pinyin}
