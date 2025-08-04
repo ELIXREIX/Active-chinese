@@ -60,15 +60,21 @@ export function QuestionCountSelection({
         </div>        {/* Question Count Options */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           {questionOptions.map((option) => {
-            const isAvailable = option.value === 'all' || (typeof option.value === 'number' && option.value <= totalWords);
-            const displayLabel = option.value === 'all' 
-              ? `All ${totalWords} Questions` 
-              : option.label;
+            const isFullyAvailable = option.value === 'all' || (typeof option.value === 'number' && option.value <= totalWords);
+            const isPartiallyAvailable = typeof option.value === 'number' && option.value > totalWords && totalWords > 0;
+            const isAvailable = isFullyAvailable || isPartiallyAvailable;
+            
+            let displayLabel = option.label;
+            if (option.value === 'all') {
+              displayLabel = `All ${totalWords} Questions`;
+            } else if (isPartiallyAvailable) {
+              displayLabel = `${totalWords} Questions (Max Available)`;
+            }
             
             return (
               <button
                 key={option.value}
-                onClick={() => isAvailable && onSelectCount(option.value)}
+                onClick={() => isAvailable && onSelectCount(isPartiallyAvailable ? totalWords : option.value)}
                 disabled={!isAvailable}
                 className={cn(
                   'p-6 rounded-xl text-white transition-all duration-200 transform shadow-lg',
@@ -83,10 +89,12 @@ export function QuestionCountSelection({
                 <h3 className="text-lg font-semibold mb-2">{displayLabel}</h3>
                 <p className="text-sm opacity-90">
                   {option.value === 'all' 
-                    ? 'Practice all available words'
-                    : isAvailable 
-                      ? 'Quick practice session'
-                      : `Only ${totalWords} words available`
+                    ? `Practice all ${totalWords} available words`
+                    : isFullyAvailable 
+                      ? 'Perfect for quick practice'
+                      : isPartiallyAvailable
+                        ? `Will use all ${totalWords} available words`
+                        : `Only ${totalWords} words available`
                   }
                 </p>
                 {option.value === 'all' && (
@@ -106,6 +114,14 @@ export function QuestionCountSelection({
               💡 <span className="font-semibold">Tip:</span> Start with 10-25 questions for daily practice, 
               or choose "All Questions" for comprehensive learning sessions.
             </p>
+            {totalWords < 50 && (
+              <p className="text-amber-600 text-xs mt-2">
+                ⚠️ Some options may use fewer questions based on available data. 
+                {!import.meta.env.VITE_GOOGLE_SHEETS_API_KEY && (
+                  <span> Connect to Google Sheets for full word library.</span>
+                )}
+              </p>
+            )}
           </div>
         </div>
       </div>
